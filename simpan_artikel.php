@@ -57,9 +57,26 @@ if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] === 0) {
     exit;
 }
 
+// Buat hari_tanggal
+date_default_timezone_set('Asia/Jakarta');
+$hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+$bulan = [
+    1=>'Januari', 2=>'Februari', 3=>'Maret',
+    4=>'April', 5=>'Mei', 6=>'Juni',
+    7=>'Juli', 8=>'Agustus', 9=>'September',
+    10=>'Oktober',11=>'November',12=>'Desember'
+];
+$sekarang = new DateTime();
+$nama_hari = $hari[$sekarang->format('w')];
+$tanggal = $sekarang->format('j');
+$nama_bulan = $bulan[(int)$sekarang->format('n')];
+$tahun = $sekarang->format('Y');
+$jam = $sekarang->format('H:i');
+$hari_tanggal = "$nama_hari, $tanggal $nama_bulan $tahun | $jam";
+
 // Simpan data ke database
-$stmt = mysqli_prepare($conn, "INSERT INTO artikel (judul, id_penulis, id_kategori, isi, gambar) VALUES (?, ?, ?, ?, ?)");
-mysqli_stmt_bind_param($stmt, "siiss", $judul, $id_penulis, $id_kategori, $isi, $nama_file);
+$stmt = mysqli_prepare($conn, "INSERT INTO artikel (judul, id_penulis, id_kategori, isi, gambar, hari_tanggal) VALUES (?, ?, ?, ?, ?, ?)");
+mysqli_stmt_bind_param($stmt, "siisss", $judul, $id_penulis, $id_kategori, $isi, $nama_file, $hari_tanggal);
 
 if (mysqli_stmt_execute($stmt)) {
     echo json_encode([
